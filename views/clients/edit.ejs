@@ -1,0 +1,129 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Edit Client</h1>
+    <a href="/clients" class="btn btn-secondary">Back to Clients</a>
+</div>
+
+<!-- Display error message if any -->
+<% if (typeof errors !== 'undefined' && errors) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> <%= errors %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<% } %>
+
+<!-- Edit Client Form (uses PUT method) -->
+<div class="card">
+    <div class="card-body">
+        <form action="/clients/<%= client._id %>?_method=PUT" method="POST">
+            <!-- Name -->
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name *</label>
+                <input type="text" class="form-control" id="name" name="name" 
+                       value="<%= client.name %>" required>
+            </div>
+
+            <!-- Mobile -->
+            <div class="mb-3">
+                <label for="mobile" class="form-label">Mobile Number *</label>
+                <input type="tel" class="form-control" id="mobile" name="mobile" 
+                       value="<%= client.mobile %>" required>
+            </div>
+
+            <!-- Address -->
+            <div class="mb-3">
+                <label for="address" class="form-label">Address *</label>
+                <textarea class="form-control" id="address" name="address" rows="2" required><%= client.address %></textarea>
+            </div>
+
+            <!-- Priority -->
+            <div class="mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select class="form-select" id="priority" name="priority">
+                    <option value="High" <%= client.priority === 'High' ? 'selected' : '' %>>High Priority</option>
+                    <option value="Mid" <%= client.priority === 'Mid' ? 'selected' : '' %>>Mid Priority</option>
+                    <option value="Low" <%= client.priority === 'Low' ? 'selected' : '' %>>Low Priority</option>
+                </select>
+                <div class="form-text">Set priority for follow-up.</div>
+            </div>
+
+            <!-- Interested? (Radio buttons) -->
+            <div class="mb-3">
+                <label class="form-label">Interested in our products/services? *</label>
+                <div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="interested" id="interestedYes" value="true" 
+                               <%= client.interested === true ? 'checked' : '' %>>
+                        <label class="form-check-label" for="interestedYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="interested" id="interestedNo" value="false" 
+                               <%= client.interested === false ? 'checked' : '' %>>
+                        <label class="form-check-label" for="interestedNo">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product/Service (conditional, shown only if Interested is Yes) -->
+            <div class="mb-3" id="productServiceDiv" style="<%= client.interested === true ? 'display: block;' : 'display: none;' %>">
+                <label for="productService" class="form-label">Product / Service (required if interested)</label>
+                <input type="text" class="form-control" id="productService" name="productService" 
+                       value="<%= client.productService || '' %>">
+                <div class="form-text">e.g., Annual Maintenance Contract, CRM Software, etc.</div>
+            </div>
+
+            <!-- Expected Timeline -->
+            <div class="mb-3">
+                <label for="expectedTimeline" class="form-label">Expected Timeline (when they want the product/service)</label>
+                <input type="date" class="form-control" id="expectedTimeline" name="expectedTimeline" 
+                       value="<%= client.expectedTimeline ? client.expectedTimeline.toISOString().slice(0,10) : '' %>">
+                <div class="form-text">Optional – useful for follow-up planning.</div>
+            </div>
+
+            <!-- Last Visit Date (New Field) -->
+            <div class="mb-3">
+                <label for="lastVisitDate" class="form-label">Last Call / Visit Date</label>
+                <input type="date" class="form-control" id="lastVisitDate" name="lastVisitDate" 
+                       value="<%= client.lastVisitDate ? client.lastVisitDate.toISOString().slice(0,10) : '' %>">
+                <div class="form-text">When was the last call or personal visit?</div>
+            </div>
+
+            <!-- Remarks -->
+            <div class="mb-3">
+                <label for="remarks" class="form-label">Remarks / Notes</label>
+                <textarea class="form-control" id="remarks" name="remarks" rows="3"><%= client.remarks || '' %></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary">Update Client</button>
+                <a href="/clients" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript to show/hide product/service field based on interest selection -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const yesRadio = document.getElementById('interestedYes');
+        const noRadio = document.getElementById('interestedNo');
+        const productDiv = document.getElementById('productServiceDiv');
+        
+        function toggleProductField() {
+            if (yesRadio.checked) {
+                productDiv.style.display = 'block';
+                document.getElementById('productService').required = true;
+            } else {
+                productDiv.style.display = 'none';
+                document.getElementById('productService').required = false;
+            }
+        }
+        
+        toggleProductField();
+        yesRadio.addEventListener('change', toggleProductField);
+        noRadio.addEventListener('change', toggleProductField);
+    });
+</script>
+
+<%- include('../partials/footer') %>

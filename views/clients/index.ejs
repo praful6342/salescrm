@@ -1,0 +1,113 @@
+<%- include('../partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>All Clients</h1>
+    <a href="/clients/new" class="btn btn-primary">+ Add New Client</a>
+</div>
+
+<!-- Search and Filter Form -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="/clients" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Search</label>
+                <input type="text" name="search" class="form-control" placeholder="Name, mobile or address" value="<%= search %>">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Interest Status</label>
+                <select name="interest" class="form-select">
+                    <option value="">All</option>
+                    <option value="true" <%= interestFilter === 'true' ? 'selected' : '' %>>Interested</option>
+                    <option value="false" <%= interestFilter === 'false' ? 'selected' : '' %>>Not Interested</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a href="/clients" class="btn btn-secondary w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Export CSV Button -->
+<div class="mb-3 text-end">
+    <a href="/clients/export" class="btn btn-success">📎 Export CSV</a>
+</div>
+
+<!-- Clients Table -->
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Address</th>
+                <th>Priority</th>
+                <th>Interested</th>
+                <th>Product/Service</th>
+                <th>Expected Timeline</th>
+                <th>Last Visit Date</th>
+                <th>Remarks</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (clients.length === 0) { %>
+                <tr>
+                    <td colspan="10" class="text-center">No clients found.</td>
+                </tr>
+            <% } else { %>
+                <% clients.forEach(client => { %>
+                    <tr>
+                        <td><%= client.name %></td>
+                        <td><%= client.mobile %></td>
+                        <td><%= client.address %></td>
+                        <td>
+                            <% if (client.priority === 'High') { %>
+                                <span class="badge bg-danger">High</span>
+                            <% } else if (client.priority === 'Mid') { %>
+                                <span class="badge bg-warning text-dark">Mid</span>
+                            <% } else { %>
+                                <span class="badge bg-secondary">Low</span>
+                            <% } %>
+                        </td>
+                        <td><%= client.interested ? '✅ Yes' : '❌ No' %></td>
+                        <td><%= client.productService || '-' %></td>
+                        <td><%= client.expectedTimeline ? client.expectedTimeline.toDateString() : '-' %></td>
+                        <td><%= client.lastVisitDate ? client.lastVisitDate.toDateString() : '-' %></td>
+                        <td><%= client.remarks || '-' %></td>
+                        <td>
+                            <a href="/clients/<%= client._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+                            <form method="POST" action="/clients/<%= client._id %>?_method=DELETE" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this client?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<% if (totalPages > 1) { %>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>&interest=<%= interestFilter %>">Previous</a>
+            </li>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                    <a class="page-link" href="?page=<%= i %>&search=<%= search %>&interest=<%= interestFilter %>"><%= i %></a>
+                </li>
+            <% } %>
+            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>&interest=<%= interestFilter %>">Next</a>
+            </li>
+        </ul>
+    </nav>
+<% } %>
+
+<%- include('../partials/footer') %>

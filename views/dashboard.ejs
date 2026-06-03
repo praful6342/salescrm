@@ -1,0 +1,157 @@
+<%- include('partials/header') %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Dashboard</h1>
+    <div>
+        <a href="/clients" class="btn btn-outline-primary">All Clients</a>
+        <a href="/clients/new" class="btn btn-primary">+ Add Client</a>
+    </div>
+</div>
+
+<!-- Clickable Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <a href="/clients" style="text-decoration: none;">
+            <div class="card text-white bg-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Clients</h5>
+                    <p class="card-text display-4"><%= totalClients %></p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="/clients?interest=true" style="text-decoration: none;">
+            <div class="card text-white bg-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Interested</h5>
+                    <p class="card-text display-4"><%= interestedCount %></p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 mb-3">
+        <a href="/clients?interest=false" style="text-decoration: none;">
+            <div class="card text-white bg-danger h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Not Interested</h5>
+                    <p class="card-text display-4"><%= notInterestedCount %></p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Two-column layout for priority lists -->
+<div class="row mb-4">
+    <!-- High Priority Clients -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">⚠️ High Priority Clients</h5>
+            </div>
+            <div class="card-body">
+                <% if (highPriorityClients.length === 0) { %>
+                    <p class="text-muted">No high priority clients.</p>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr><th>Name</th><th>Mobile</th><th>Interested</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                                <% highPriorityClients.forEach(client => { %>
+                                    <tr>
+                                        <td><%= client.name %></td>
+                                        <td><%= client.mobile %></td>
+                                        <td><%= client.interested ? 'Yes' : 'No' %></td>
+                                        <td><a href="/clients/<%= client._id %>/edit" class="btn btn-sm btn-outline-warning">Edit</a></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% if (highPriorityClients.length >= 10) { %>
+                        <div class="text-end mt-2">
+                            <a href="/clients?priority=High" class="btn btn-sm btn-link">View all high priority →</a>
+                        </div>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mid Priority Clients -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📌 Mid Priority Clients</h5>
+            </div>
+            <div class="card-body">
+                <% if (midPriorityClients.length === 0) { %>
+                    <p class="text-muted">No mid priority clients.</p>
+                <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr><th>Name</th><th>Mobile</th><th>Interested</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                                <% midPriorityClients.forEach(client => { %>
+                                    <tr>
+                                        <td><%= client.name %></td>
+                                        <td><%= client.mobile %></td>
+                                        <td><%= client.interested ? 'Yes' : 'No' %></td>
+                                        <td><a href="/clients/<%= client._id %>/edit" class="btn btn-sm btn-outline-warning">Edit</a></td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% if (midPriorityClients.length >= 10) { %>
+                        <div class="text-end mt-2">
+                            <a href="/clients?priority=Mid" class="btn btn-sm btn-link">View all mid priority →</a>
+                        </div>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Follow-ups (next 30 days) -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">📅 Upcoming Follow-ups (next 30 days)</h5>
+    </div>
+    <div class="card-body">
+        <% if (upcoming.length === 0) { %>
+            <p class="text-muted">No upcoming follow-ups scheduled.</p>
+        <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr><th>Name</th><th>Mobile</th><th>Expected Timeline</th><th>Priority</th><th>Action</th></tr>
+                    </thead>
+                    <tbody>
+                        <% upcoming.forEach(client => { %>
+                            <tr>
+                                <td><%= client.name %></td>
+                                <td><%= client.mobile %></td>
+                                <td><%= client.expectedTimeline ? client.expectedTimeline.toDateString() : 'Not set' %></td>
+                                <td>
+                                    <span class="badge <%= client.priority === 'High' ? 'bg-danger' : (client.priority === 'Mid' ? 'bg-warning' : 'bg-secondary') %>">
+                                        <%= client.priority || 'Mid' %>
+                                    </span>
+                                </td>
+                                <td><a href="/clients/<%= client._id %>/edit" class="btn btn-sm btn-warning">Edit</a></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
