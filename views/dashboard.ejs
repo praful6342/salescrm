@@ -47,12 +47,15 @@
     <!-- High Priority Clients -->
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header bg-danger text-white">
-                <h5 class="mb-0">⚠️ High Priority Clients</h5>
+            <div class="card-header bg-danger text-white" data-bs-toggle="collapse" data-bs-target="#highPriorityCollapse" style="cursor: pointer;">
+                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>⚠️ High Priority Clients</span>
+                    <span class="badge bg-light text-dark"><%= highPriorityClients.length %></span>
+                </h5>
             </div>
-            <div class="card-body">
+            <div id="highPriorityCollapse" class="collapse show card-body">
                 <% if (highPriorityClients.length === 0) { %>
-                    <p class="text-muted">No high priority clients.</p>
+                    <p class="text-muted mb-0">No high priority clients.</p>
                 <% } else { %>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover">
@@ -84,12 +87,15 @@
     <!-- Mid Priority Clients -->
     <div class="col-md-6">
         <div class="card h-100">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">📌 Mid Priority Clients</h5>
+            <div class="card-header bg-warning text-dark" data-bs-toggle="collapse" data-bs-target="#midPriorityCollapse" style="cursor: pointer;">
+                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>📌 Mid Priority Clients</span>
+                    <span class="badge bg-dark text-light"><%= midPriorityClients.length %></span>
+                </h5>
             </div>
-            <div class="card-body">
+            <div id="midPriorityCollapse" class="collapse show card-body">
                 <% if (midPriorityClients.length === 0) { %>
-                    <p class="text-muted">No mid priority clients.</p>
+                    <p class="text-muted mb-0">No mid priority clients.</p>
                 <% } else { %>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover">
