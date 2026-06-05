@@ -1,130 +1,294 @@
 <%- include('../partials/header') %>
-
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Add New Client</h1>
-    <a href="/clients" class="btn btn-secondary">Back to Clients</a>
+  <h1>Add New Client</h1>
+  <a href="/clients" class="btn btn-secondary">Back to Clients</a>
 </div>
 
 <!-- Display error message if any -->
 <% if (typeof errors !== 'undefined' && errors) { %>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Error:</strong> <%= errors %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Error:</strong> <%= errors %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
 <% } %>
 
 <!-- Add Client Form -->
 <div class="card">
-    <div class="card-body">
-        <form action="/clients" method="POST">
-            <!-- Name -->
-            <div class="mb-3">
-                <label for="name" class="form-label">Full Name *</label>
-                <input type="text" class="form-control" id="name" name="name" 
-                       value="<%= client && client.name ? client.name : '' %>" required>
-            </div>
+  <div class="card-body">
+    <form action="/clients" method="POST" id="clientForm">
+      <!-- Name -->
+      <div class="mb-3">
+        <label for="name" class="form-label">Full Name *</label>
+        <input type="text" class="form-control" id="name" name="name"
+          value="<%= client && client.name ? client.name : '' %>" required>
+      </div>
 
-            <!-- Mobile -->
-            <div class="mb-3">
-                <label for="mobile" class="form-label">Mobile Number *</label>
-                <input type="tel" class="form-control" id="mobile" name="mobile" 
-                       value="<%= client && client.mobile ? client.mobile : '' %>" 
-                       placeholder="e.g., 9876543210" required>
-            </div>
+      <!-- Mobile -->
+      <div class="mb-3">
+        <label for="mobile" class="form-label">Mobile Number *</label>
+        <input type="tel" class="form-control" id="mobile" name="mobile"
+          value="<%= client && client.mobile ? client.mobile : '' %>"
+          placeholder="e.g., 9876543210" required>
+      </div>
 
-            <!-- Address -->
-            <div class="mb-3">
-                <label for="address" class="form-label">Address *</label>
-                <textarea class="form-control" id="address" name="address" rows="2" required><%= client && client.address ? client.address : '' %></textarea>
-            </div>
+      <!-- Address -->
+      <div class="mb-3">
+        <label for="address" class="form-label">Address *</label>
+        <textarea class="form-control" id="address" name="address" rows="2" required><%= client && client.address ? client.address : '' %></textarea>
+      </div>
 
-            <!-- Priority -->
-            <div class="mb-3">
-                <label for="priority" class="form-label">Priority</label>
-                <select class="form-select" id="priority" name="priority">
-                    <option value="High" <%= (client && client.priority === 'High') ? 'selected' : '' %>>High Priority</option>
-                    <option value="Mid" <%= (client && client.priority === 'Mid') ? 'selected' : '' %>>Mid Priority</option>
-                    <option value="Low" <%= (client && client.priority === 'Low') ? 'selected' : '' %>>Low Priority</option>
-                </select>
-                <div class="form-text">Set priority for follow-up.</div>
-            </div>
+      <!-- Priority -->
+      <div class="mb-3">
+        <label for="priority" class="form-label">Priority</label>
+        <select class="form-select" id="priority" name="priority">
+          <option value="High" <%= (client && client.priority === 'High') ? 'selected' : '' %>>High Priority</option>
+          <option value="Mid" <%= (client && client.priority === 'Mid') ? 'selected' : '' %>>Mid Priority</option>
+          <option value="Low" <%= (client && client.priority === 'Low') ? 'selected' : '' %>>Low Priority</option>
+        </select>
+        <div class="form-text">Set priority for follow-up.</div>
+      </div>
 
-            <!-- Interested? (Radio buttons) -->
-            <div class="mb-3">
-                <label class="form-label">Interested in our products/services? *</label>
-                <div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="interested" id="interestedYes" value="true" 
-                               <%= (client && client.interested === true) ? 'checked' : '' %>>
-                        <label class="form-check-label" for="interestedYes">Yes</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="interested" id="interestedNo" value="false" 
-                               <%= (client && client.interested === false) ? 'checked' : '' %>>
-                        <label class="form-check-label" for="interestedNo">No</label>
-                    </div>
-                </div>
-            </div>
+      <!-- Interested? (Radio buttons) -->
+      <div class="mb-3">
+        <label class="form-label">Interested in our products/services? *</label>
+        <div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="interested" id="interestedYes" value="true"
+              <%= (client && client.interested === true) ? 'checked' : '' %>>
+            <label class="form-check-label" for="interestedYes">Yes</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="interested" id="interestedNo" value="false"
+              <%= (client && client.interested === false) ? 'checked' : '' %>>
+            <label class="form-check-label" for="interestedNo">No</label>
+          </div>
+        </div>
+      </div>
 
-            <!-- Product/Service (conditional, shown only if Interested is Yes) -->
-            <div class="mb-3" id="productServiceDiv" style="display: none;">
-                <label for="productService" class="form-label">Product / Service (required if interested)</label>
-                <input type="text" class="form-control" id="productService" name="productService" 
-                       value="<%= client && client.productService ? client.productService : '' %>">
-                <div class="form-text">e.g., Annual Maintenance Contract, CRM Software, etc.</div>
-            </div>
+      <!-- Product/Service (Dropdown with Add New option) -->
+      <div class="mb-3" id="productServiceDiv" style="display: none;">
+        <label for="productService" class="form-label">Product / Service (required if interested)</label>
+        <div class="input-group">
+          <select class="form-select" id="productService" name="productService">
+            <option value="">-- Select Product/Service --</option>
+          </select>
+          <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+            + Add New
+          </button>
+        </div>
+        <div class="form-text">Select from existing or click "Add New" to create a product/service.</div>
+      </div>
 
-            <!-- Expected Timeline -->
-            <div class="mb-3">
-                <label for="expectedTimeline" class="form-label">Expected Timeline (when they want the product/service)</label>
-                <input type="date" class="form-control" id="expectedTimeline" name="expectedTimeline" 
-                       value="<%= client && client.expectedTimeline ? client.expectedTimeline.toISOString().slice(0,10) : '' %>">
-                <div class="form-text">Optional – useful for follow-up planning.</div>
-            </div>
+      <!-- Expected Amount (NEW FIELD) -->
+      <div class="mb-3" id="expectedAmountDiv" style="display: none;">
+        <label for="expectedAmount" class="form-label">Expected Amount of Business (₹)</label>
+        <input type="number" class="form-control" id="expectedAmount" name="expectedAmount" min="0" 
+          placeholder="e.g., 50000"
+          value="<%= client && client.expectedAmount ? client.expectedAmount : '' %>">
+        <div class="form-text">Estimated revenue from this client.</div>
+      </div>
 
-            <!-- Last Visit Date (New Field) -->
-            <div class="mb-3">
-                <label for="lastVisitDate" class="form-label">Last Call / Visit Date</label>
-                <input type="date" class="form-control" id="lastVisitDate" name="lastVisitDate" 
-                       value="<%= client && client.lastVisitDate ? client.lastVisitDate.toISOString().slice(0,10) : '' %>">
-                <div class="form-text">When was the last call or personal visit?</div>
-            </div>
+      <!-- Expected Timeline (safe date formatting) -->
+      <div class="mb-3">
+        <label for="expectedTimeline" class="form-label">Expected Timeline (when they want the product/service)</label>
+        <input type="date" class="form-control" id="expectedTimeline" name="expectedTimeline"
+          value="<%= client && client.expectedTimeline ? (typeof client.expectedTimeline === 'string' ? client.expectedTimeline.slice(0,10) : client.expectedTimeline.toISOString().slice(0,10)) : '' %>">
+        <div class="form-text">Optional – useful for follow-up planning.</div>
+      </div>
 
-            <!-- Remarks -->
-            <div class="mb-3">
-                <label for="remarks" class="form-label">Remarks / Notes</label>
-                <textarea class="form-control" id="remarks" name="remarks" rows="3"><%= client && client.remarks ? client.remarks : '' %></textarea>
-            </div>
+      <!-- Last Visit Date (safe date formatting) -->
+      <div class="mb-3">
+        <label for="lastVisitDate" class="form-label">Last Call / Visit Date</label>
+        <input type="date" class="form-control" id="lastVisitDate" name="lastVisitDate"
+          value="<%= client && client.lastVisitDate ? (typeof client.lastVisitDate === 'string' ? client.lastVisitDate.slice(0,10) : client.lastVisitDate.toISOString().slice(0,10)) : '' %>">
+        <div class="form-text">When was the last call or personal visit?</div>
+      </div>
 
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Save Client</button>
-                <a href="/clients" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
+      <!-- Remarks -->
+      <div class="mb-3">
+        <label for="remarks" class="form-label">Remarks / Notes</label>
+        <textarea class="form-control" id="remarks" name="remarks" rows="3"><%= client && client.remarks ? client.remarks : '' %></textarea>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Save Client</button>
+        <a href="/clients" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
 
-<!-- JavaScript to show/hide product/service field based on interest selection -->
+<!-- Modal for Adding New Product/Service -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addProductModalLabel">Add New Product/Service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="newProductName" class="form-label">Product/Service Name</label>
+          <input type="text" class="form-control" id="newProductName" placeholder="e.g., Annual Maintenance Contract">
+        </div>
+        <div class="alert alert-danger d-none" id="productErrorMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveProductBtn">Save Product</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript for product management and form behavior -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const yesRadio = document.getElementById('interestedYes');
-        const noRadio = document.getElementById('interestedNo');
-        const productDiv = document.getElementById('productServiceDiv');
-        
-        function toggleProductField() {
-            if (yesRadio.checked) {
-                productDiv.style.display = 'block';
-                document.getElementById('productService').required = true;
-            } else {
-                productDiv.style.display = 'none';
-                document.getElementById('productService').required = false;
-            }
+document.addEventListener('DOMContentLoaded', function() {
+  const yesRadio = document.getElementById('interestedYes');
+  const noRadio = document.getElementById('interestedNo');
+  const productDiv = document.getElementById('productServiceDiv');
+  const expectedAmountDiv = document.getElementById('expectedAmountDiv'); // NEW
+  const productSelect = document.getElementById('productService');
+  const currentProductValue = '<%= client && client.productService ? client.productService : "" %>';
+
+  // Function to load products from the server
+  async function loadProducts() {
+    try {
+      const response = await fetch('/api/products');
+      const products = await response.json();
+      
+      // Clear existing options (keep first placeholder)
+      while (productSelect.options.length > 1) {
+        productSelect.remove(1);
+      }
+      
+      // Add products to dropdown
+      products.forEach(product => {
+        const option = document.createElement('option');
+        option.value = product.name;
+        option.textContent = product.name;
+        productSelect.appendChild(option);
+      });
+      
+      // Pre-select the client's current product if it exists
+      if (currentProductValue) {
+        productSelect.value = currentProductValue;
+        // If the product value exists but not in dropdown (e.g., old data), add it as an option
+        if (!productSelect.value && currentProductValue) {
+          const option = document.createElement('option');
+          option.value = currentProductValue;
+          option.textContent = currentProductValue;
+          option.selected = true;
+          productSelect.appendChild(option);
         }
-        
-        toggleProductField();
-        yesRadio.addEventListener('change', toggleProductField);
-        noRadio.addEventListener('change', toggleProductField);
+      }
+    } catch (err) {
+      console.error('Failed to load products:', err);
+    }
+  }
+
+  // Function to add a new product
+  async function addProduct(productName) {
+    try {
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: productName })
+      });
+      
+      if (response.ok) {
+        const newProduct = await response.json();
+        // Add to dropdown
+        const option = document.createElement('option');
+        option.value = newProduct.name;
+        option.textContent = newProduct.name;
+        productSelect.appendChild(option);
+        // Select the new product
+        productSelect.value = newProduct.name;
+        return true;
+      } else {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to add product');
+      }
+    } catch (err) {
+      console.error('Error adding product:', err);
+      return false;
+    }
+  }
+
+  // Toggle product and expected amount fields visibility based on interest
+  function toggleProductField() {
+    if (yesRadio.checked) {
+      productDiv.style.display = 'block';
+      expectedAmountDiv.style.display = 'block'; // NEW
+      if (productSelect.options.length <= 1) {
+        loadProducts();
+      }
+    } else {
+      productDiv.style.display = 'none';
+      expectedAmountDiv.style.display = 'none'; // NEW
+    }
+  }
+
+  // Save product button handler
+  const saveBtn = document.getElementById('saveProductBtn');
+  const newProductInput = document.getElementById('newProductName');
+  const errorDiv = document.getElementById('productErrorMsg');
+  
+  if (saveBtn) {
+    saveBtn.addEventListener('click', async function() {
+      const productName = newProductInput ? newProductInput.value.trim() : '';
+      
+      if (!productName) {
+        if (errorDiv) {
+          errorDiv.textContent = 'Please enter a product/service name.';
+          errorDiv.classList.remove('d-none');
+        }
+        return;
+      }
+      
+      if (errorDiv) {
+        errorDiv.classList.add('d-none');
+      }
+      
+      const success = await addProduct(productName);
+      if (success) {
+        // Clear input and close modal
+        if (newProductInput) newProductInput.value = '';
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+        if (modal) modal.hide();
+      } else {
+        if (errorDiv) {
+          errorDiv.textContent = 'Failed to add product. Please try again.';
+          errorDiv.classList.remove('d-none');
+        }
+      }
     });
+  }
+
+  // Clear error when typing in modal input
+  if (newProductInput) {
+    newProductInput.addEventListener('input', function() {
+      if (errorDiv) errorDiv.classList.add('d-none');
+    });
+  }
+
+  // Initial state
+  toggleProductField();
+  
+  // Listen for changes
+  if (yesRadio && noRadio) {
+    yesRadio.addEventListener('change', toggleProductField);
+    noRadio.addEventListener('change', toggleProductField);
+  }
+  
+  // Load products if "Yes" is initially checked
+  if (yesRadio && yesRadio.checked) {
+    loadProducts();
+  }
+});
 </script>
 
 <%- include('../partials/footer') %>

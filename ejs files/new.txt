@@ -1,11 +1,8 @@
 <%- include('../partials/header') %>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Edit Client</h1>
-    <div>
-        <a href="/clients/<%= client._id %>" class="btn btn-info">View Details</a>
-        <a href="/clients" class="btn btn-secondary">Back to Clients</a>
-    </div>
+    <h1>Add New Client</h1>
+    <a href="/clients" class="btn btn-secondary">Back to Clients</a>
 </div>
 
 <!-- Display error message if any -->
@@ -16,58 +13,40 @@
     </div>
 <% } %>
 
-<!-- Edit Client Form (uses PUT method) -->
+<!-- Add Client Form -->
 <div class="card">
     <div class="card-body">
-        <form action="/clients/<%= client._id %>?_method=PUT" method="POST" id="clientForm">
+        <form action="/clients" method="POST" id="clientForm">
             <!-- Name -->
             <div class="mb-3">
                 <label for="name" class="form-label">Full Name *</label>
                 <input type="text" class="form-control" id="name" name="name" 
-                       value="<%= client.name %>" required>
+                       value="<%= client && client.name ? client.name : '' %>" required>
             </div>
 
             <!-- Mobile -->
             <div class="mb-3">
                 <label for="mobile" class="form-label">Mobile Number *</label>
                 <input type="tel" class="form-control" id="mobile" name="mobile" 
-                       value="<%= client.mobile %>" required>
+                       value="<%= client && client.mobile ? client.mobile : '' %>" 
+                       placeholder="e.g., 9876543210" required>
             </div>
 
             <!-- Address -->
             <div class="mb-3">
                 <label for="address" class="form-label">Address *</label>
-                <textarea class="form-control" id="address" name="address" rows="2" required><%= client.address %></textarea>
+                <textarea class="form-control" id="address" name="address" rows="2" required><%= client && client.address ? client.address : '' %></textarea>
             </div>
 
             <!-- Priority -->
             <div class="mb-3">
                 <label for="priority" class="form-label">Priority</label>
                 <select class="form-select" id="priority" name="priority">
-                    <option value="High" <%= client.priority === 'High' ? 'selected' : '' %>>High Priority</option>
-                    <option value="Mid" <%= client.priority === 'Mid' ? 'selected' : '' %>>Mid Priority</option>
-                    <option value="Low" <%= client.priority === 'Low' ? 'selected' : '' %>>Low Priority</option>
+                    <option value="High" <%= (client && client.priority === 'High') ? 'selected' : '' %>>High Priority</option>
+                    <option value="Mid" <%= (client && client.priority === 'Mid') ? 'selected' : '' %>>Mid Priority</option>
+                    <option value="Low" <%= (client && client.priority === 'Low') ? 'selected' : '' %>>Low Priority</option>
                 </select>
                 <div class="form-text">Set priority for follow-up.</div>
-            </div>
-
-            <!-- Status (New Field) -->
-            <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select class="form-select" id="status" name="status">
-                    <option value="Open" <%= client.status === 'Open' ? 'selected' : '' %>>Open</option>
-                    <option value="Resolved" <%= client.status === 'Resolved' ? 'selected' : '' %>>Resolved</option>
-                    <option value="Closed" <%= client.status === 'Closed' ? 'selected' : '' %>>Closed</option>
-                </select>
-                <div class="form-text">
-                    <% if (client.status === 'Open') { %>
-                        ⚠️ Client is active and needs follow-up.
-                    <% } else if (client.status === 'Resolved') { %>
-                        ✓ Issue resolved or product delivered.
-                    <% } else { %>
-                        ✓ No further action needed.
-                    <% } %>
-                </div>
             </div>
 
             <!-- Interested? (Radio buttons) -->
@@ -76,19 +55,19 @@
                 <div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="interested" id="interestedYes" value="true" 
-                               <%= client.interested === true ? 'checked' : '' %>>
+                               <%= (client && client.interested === true) ? 'checked' : '' %>>
                         <label class="form-check-label" for="interestedYes">Yes</label>
                     </div>
                     <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="interested" id="interestedNo" value="false" 
-                               <%= client.interested === false ? 'checked' : '' %>>
+                               <%= (client && client.interested === false) ? 'checked' : '' %>>
                         <label class="form-check-label" for="interestedNo">No</label>
                     </div>
                 </div>
             </div>
 
-            <!-- Product/Service (conditional, shown only if Interested is Yes) -->
-            <div class="mb-3" id="productServiceDiv" style="<%= client.interested === true ? 'display: block;' : 'display: none;' %>">
+            <!-- Product/Service (Dropdown with Add New option) -->
+            <div class="mb-3" id="productServiceDiv" style="display: none;">
                 <label for="productService" class="form-label">Product / Service (required if interested)</label>
                 <div class="input-group">
                     <select class="form-select" id="productService" name="productService">
@@ -101,30 +80,30 @@
                 <div class="form-text">Select from existing or click "Add New" to create a product/service.</div>
             </div>
 
-            <!-- Expected Timeline -->
+            <!-- Expected Timeline (safe date formatting) -->
             <div class="mb-3">
                 <label for="expectedTimeline" class="form-label">Expected Timeline (when they want the product/service)</label>
                 <input type="date" class="form-control" id="expectedTimeline" name="expectedTimeline" 
-                       value="<%= client.expectedTimeline ? client.expectedTimeline.toISOString().slice(0,10) : '' %>">
+                       value="<%= client && client.expectedTimeline ? (typeof client.expectedTimeline === 'string' ? client.expectedTimeline.slice(0,10) : client.expectedTimeline.toISOString().slice(0,10)) : '' %>">
                 <div class="form-text">Optional – useful for follow-up planning.</div>
             </div>
 
-            <!-- Last Visit Date -->
+            <!-- Last Visit Date (safe date formatting) -->
             <div class="mb-3">
                 <label for="lastVisitDate" class="form-label">Last Call / Visit Date</label>
                 <input type="date" class="form-control" id="lastVisitDate" name="lastVisitDate" 
-                       value="<%= client.lastVisitDate ? client.lastVisitDate.toISOString().slice(0,10) : '' %>">
+                       value="<%= client && client.lastVisitDate ? (typeof client.lastVisitDate === 'string' ? client.lastVisitDate.slice(0,10) : client.lastVisitDate.toISOString().slice(0,10)) : '' %>">
                 <div class="form-text">When was the last call or personal visit?</div>
             </div>
 
             <!-- Remarks -->
             <div class="mb-3">
                 <label for="remarks" class="form-label">Remarks / Notes</label>
-                <textarea class="form-control" id="remarks" name="remarks" rows="3"><%= client.remarks || '' %></textarea>
+                <textarea class="form-control" id="remarks" name="remarks" rows="3"><%= client && client.remarks ? client.remarks : '' %></textarea>
             </div>
 
             <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary">Update Client</button>
+                <button type="submit" class="btn btn-primary">Save Client</button>
                 <a href="/clients" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
@@ -161,7 +140,7 @@
         const noRadio = document.getElementById('interestedNo');
         const productDiv = document.getElementById('productServiceDiv');
         const productSelect = document.getElementById('productService');
-        const currentProductValue = '<%= client.productService || "" %>';
+        const currentProductValue = '<%= client && client.productService ? client.productService : "" %>';
         
         // Function to load products from the server
         async function loadProducts() {
@@ -213,10 +192,12 @@
                 
                 if (response.ok) {
                     const newProduct = await response.json();
+                    // Add to dropdown
                     const option = document.createElement('option');
                     option.value = newProduct.name;
                     option.textContent = newProduct.name;
                     productSelect.appendChild(option);
+                    // Select the new product
                     productSelect.value = newProduct.name;
                     return true;
                 } else {
@@ -264,6 +245,7 @@
                 
                 const success = await addProduct(productName);
                 if (success) {
+                    // Clear input and close modal
                     if (newProductInput) newProductInput.value = '';
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
                     if (modal) modal.hide();

@@ -1,4 +1,6 @@
 const Client = require('../models/Client');
+const Product = require('../models/Product');
+const Activity = require('../models/Activity');
 
 // Show all clients (with search, filter, pagination)
 exports.listClients = async (req, res) => {
@@ -40,6 +42,25 @@ exports.listClients = async (req, res) => {
   }
 };
 
+// Show a single client with their activities
+exports.showClient = async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.id);
+    if (!client) {
+      return res.redirect('/clients');
+    }
+    
+    // Fetch activities for this client
+    const activities = await Activity.find({ clientId: client._id })
+      .sort({ createdAt: -1 }); // Newest first
+    
+    res.render('clients/show', { client, activities });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/clients');
+  }
+};
+
 // Show form to add a new client
 exports.newClientForm = (req, res) => {
   res.render('clients/new', { client: null, errors: null });
@@ -60,7 +81,8 @@ exports.createClient = async (req, res) => {
       expectedTimeline: expectedTimeline || null,
       remarks: remarks || '',
       priority: priority || 'Mid',
-      lastVisitDate: lastVisitDate || null
+      lastVisitDate: lastVisitDate || null,
+      status: 'Open' // Default status for new clients
     });
     
     await newClient.save();
@@ -92,7 +114,7 @@ exports.editClientForm = async (req, res) => {
 // Update an existing client
 exports.updateClient = async (req, res) => {
   try {
-    const { name, mobile, address, interested, productService, expectedTimeline, remarks, priority, lastVisitDate } = req.body;
+    const { name, mobile, address, interested, productService, expectedTimeline, remarks, priority, lastVisitDate, status } = req.body;
     const isInterested = (interested === 'on' || interested === 'true');
     
     const updateData = {
@@ -104,7 +126,8 @@ exports.updateClient = async (req, res) => {
       expectedTimeline: expectedTimeline || null,
       remarks: remarks || '',
       priority: priority || 'Mid',
-      lastVisitDate: lastVisitDate || null
+      lastVisitDate: lastVisitDate || null,
+      status: status || 'Open'
     };
     
     await Client.findByIdAndUpdate(req.params.id, updateData, { runValidators: true });
@@ -126,6 +149,8 @@ exports.updateClient = async (req, res) => {
 // Delete a client
 exports.deleteClient = async (req, res) => {
   try {
+    // Also delete all activities associated with this client
+    await Activity.deleteMany({ clientId: req.params.id });
     await Client.findByIdAndDelete(req.params.id);
     res.redirect('/clients');
   } catch (err) {
@@ -174,7 +199,7 @@ exports.dashboard = async (req, res) => {
 exports.exportClients = async (req, res) => {
   try {
     const clients = await Client.find().sort({ createdAt: -1 });
-    let csv = 'Name,Mobile,Address,Priority,Interested,Product/Service,Expected Timeline,Last Visit Date,Remarks,Created At\n';
+    let csv = 'Name,Mobile,Address,Priority,Status,Interested,Product/Service,Expected Timeline,Last Visit Date,Remarks,Created At\n';
     
     clients.forEach(client => {
       const row = [
@@ -182,6 +207,7 @@ exports.exportClients = async (req, res) => {
         client.mobile,
         `"${client.address.replace(/"/g, '""')}"`,
         client.priority || 'Mid',
+        client.status || 'Open',
         client.interested ? 'Yes' : 'No',
         `"${(client.productService || '').replace(/"/g, '""')}"`,
         client.expectedTimeline ? client.expectedTimeline.toISOString().slice(0,10) : '',

@@ -20,9 +20,11 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static('public'));
 
-// Routes (no authentication)
+// Routes
 app.get('/dashboard', clientController.dashboard);
 app.use('/clients', require('./routes/clientRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/activities', require('./routes/activityRoutes'));  // Activity API routes
 
 // Root redirects to dashboard
 app.get('/', (req, res) => {
@@ -31,5 +33,4 @@ app.get('/', (req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-app.get('/test', (req, res) => res.send('Server is working'));
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
