@@ -101,6 +101,15 @@
                 <div class="form-text">Select from existing or click "Add New" to create a product/service.</div>
             </div>
 
+            <!-- Expected Amount (conditional, shown only if Interested is Yes) -->
+            <div class="mb-3" id="expectedAmountDiv" style="<%= client.interested === true ? 'display: block;' : 'display: none;' %>">
+                <label for="expectedAmount" class="form-label">Expected Amount of Business (₹)</label>
+                <input type="number" class="form-control" id="expectedAmount" name="expectedAmount" min="0" 
+                    placeholder="e.g., 50000"
+                    value="<%= client.expectedAmount || '' %>">
+                <div class="form-text">Estimated revenue from this client.</div>
+            </div>
+
             <!-- Expected Timeline -->
             <div class="mb-3">
                 <label for="expectedTimeline" class="form-label">Expected Timeline (when they want the product/service)</label>
@@ -160,6 +169,7 @@
         const yesRadio = document.getElementById('interestedYes');
         const noRadio = document.getElementById('interestedNo');
         const productDiv = document.getElementById('productServiceDiv');
+        const expectedAmountDiv = document.getElementById('expectedAmountDiv');
         const productSelect = document.getElementById('productService');
         const currentProductValue = '<%= client.productService || "" %>';
         
@@ -229,15 +239,17 @@
             }
         }
         
-        // Toggle product field visibility based on interest
+        // Toggle product and expected amount fields visibility based on interest
         function toggleProductField() {
             if (yesRadio.checked) {
                 productDiv.style.display = 'block';
+                expectedAmountDiv.style.display = 'block';
                 if (productSelect.options.length <= 1) {
                     loadProducts();
                 }
             } else {
                 productDiv.style.display = 'none';
+                expectedAmountDiv.style.display = 'none';
             }
         }
         

@@ -48,6 +48,7 @@
                 <th>Status</th>
                 <th>Interested</th>
                 <th>Product/Service</th>
+                <th>Expected Amount</th>
                 <th>Expected Timeline</th>
                 <th>Last Visit Date</th>
                 <th>Actions</th>
@@ -84,6 +85,7 @@
                         </td>
                         <td><%= client.interested ? '✅ Yes' : '❌ No' %></td>
                         <td><%= client.productService || '-' %></td>
+                        <td><%= client.interested && client.expectedAmount ? '₹' + client.expectedAmount.toLocaleString() : '-' %></td>
                         <td><%= client.expectedTimeline ? client.expectedTimeline.toDateString() : '-' %></td>
                         <td><%= client.lastVisitDate ? client.lastVisitDate.toDateString() : '-' %></td>
                         <td>
