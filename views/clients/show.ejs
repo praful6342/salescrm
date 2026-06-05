@@ -34,6 +34,7 @@
                 <p><strong>Interested:</strong> <%= client.interested ? 'Yes' : 'No' %></p>
                 <% if (client.interested) { %>
                     <p><strong>Product/Service:</strong> <%= client.productService || '-' %></p>
+                    <p><strong>Expected Amount:</strong> <%= client.expectedAmount ? '₹' + client.expectedAmount.toLocaleString() : '-' %></p>
                 <% } %>
                 <p><strong>Expected Timeline:</strong> <%= client.expectedTimeline ? client.expectedTimeline.toDateString() : '-' %></p>
                 <p><strong>Last Visit Date:</strong> <%= client.lastVisitDate ? client.lastVisitDate.toDateString() : '-' %></p>

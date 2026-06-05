@@ -69,7 +69,7 @@ exports.newClientForm = (req, res) => {
 // Save a new client
 exports.createClient = async (req, res) => {
   try {
-    const { name, mobile, address, interested, productService, expectedTimeline, remarks, priority, lastVisitDate } = req.body;
+    const { name, mobile, address, interested, productService, expectedAmount, expectedTimeline, remarks, priority, lastVisitDate } = req.body;
     const isInterested = (interested === 'on' || interested === 'true');
     
     const newClient = new Client({
@@ -78,6 +78,7 @@ exports.createClient = async (req, res) => {
       address,
       interested: isInterested,
       productService: isInterested ? (productService || '') : undefined,
+      expectedAmount: isInterested ? (expectedAmount || 0) : 0,
       expectedTimeline: expectedTimeline || null,
       remarks: remarks || '',
       priority: priority || 'Mid',
@@ -114,7 +115,7 @@ exports.editClientForm = async (req, res) => {
 // Update an existing client
 exports.updateClient = async (req, res) => {
   try {
-    const { name, mobile, address, interested, productService, expectedTimeline, remarks, priority, lastVisitDate, status } = req.body;
+    const { name, mobile, address, interested, productService, expectedAmount, expectedTimeline, remarks, priority, lastVisitDate, status } = req.body;
     const isInterested = (interested === 'on' || interested === 'true');
     
     const updateData = {
@@ -123,6 +124,7 @@ exports.updateClient = async (req, res) => {
       address,
       interested: isInterested,
       productService: isInterested ? (productService || '') : undefined,
+      expectedAmount: isInterested ? (expectedAmount || 0) : 0,
       expectedTimeline: expectedTimeline || null,
       remarks: remarks || '',
       priority: priority || 'Mid',
@@ -199,7 +201,7 @@ exports.dashboard = async (req, res) => {
 exports.exportClients = async (req, res) => {
   try {
     const clients = await Client.find().sort({ createdAt: -1 });
-    let csv = 'Name,Mobile,Address,Priority,Status,Interested,Product/Service,Expected Timeline,Last Visit Date,Remarks,Created At\n';
+    let csv = 'Name,Mobile,Address,Priority,Status,Interested,Product/Service,Expected Amount,Expected Timeline,Last Visit Date,Remarks,Created At\n';
     
     clients.forEach(client => {
       const row = [
@@ -210,6 +212,7 @@ exports.exportClients = async (req, res) => {
         client.status || 'Open',
         client.interested ? 'Yes' : 'No',
         `"${(client.productService || '').replace(/"/g, '""')}"`,
+        client.expectedAmount || 0,
         client.expectedTimeline ? client.expectedTimeline.toISOString().slice(0,10) : '',
         client.lastVisitDate ? client.lastVisitDate.toISOString().slice(0,10) : '',
         `"${(client.remarks || '').replace(/"/g, '""')}"`,
