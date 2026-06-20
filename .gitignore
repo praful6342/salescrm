@@ -1,1 +1,6 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'views/dashboard.ejs', which is a source code file and should not be added to .gitignore.
+node_modules/
+data/
+server.key
+server.crt
+.env
+*.log
